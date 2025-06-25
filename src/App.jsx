@@ -274,7 +274,17 @@ function App() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="department">Team <span style={{ color: "red" }}>*</span> </label>
+                <label htmlFor="department" style={{ display: "flex", alignItems: "center", gap: "1px" }}>
+                  Team <span style={{ color: "red" }}>*</span>
+                  <span className="tooltip-button">
+                    i
+                    <div className="tooltip">
+                      CL - Classic<br />
+                      UL - Ultima<br />
+                      SL - Super yacht
+                    </div>
+                  </span>
+                </label>
                 <select
                   id="teams"
                   name="team"
