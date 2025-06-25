@@ -385,6 +385,7 @@ function App() {
                   id="fileUpload"
                   name="fileUpload"
                   onChange={handleInputChange}
+                  capture = {false}
                   accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
                 />
                 <small>Accepted formats: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG , Max size: 15MB</small>
