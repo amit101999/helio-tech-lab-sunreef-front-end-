@@ -3,18 +3,17 @@ import './App.css'
 import axios from "axios"
 import { useEffect } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
+import logo from "./assets/logo4.png";
+import boat from "./assets/boat.jpeg"
 
 function Header() {
   return (
     <header className="header">
-      <div className="logo">
-        <span className="logo-icon"></span>
-        <div>
-          <span className='logo-name'>Sunreef Yachts</span>
-          <small >LUXURY CATAMARAN MANUFACTURER</small>
-        </div>
-      </div>
-    </header>
+  <img className="header-img" src={boat} alt="Boat" />
+  <div className="logo">
+    <img src={logo} alt="Logo" className="logo-icon" />
+  </div>
+</header>
   )
 }
 
