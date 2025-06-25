@@ -9,11 +9,11 @@ import boat from "./assets/boat.jpeg"
 function Header() {
   return (
     <header className="header">
-  <img className="header-img" src={boat} alt="Boat" />
-  <div className="logo">
-    <img src={logo} alt="Logo" className="logo-icon" />
-  </div>
-</header>
+      <img className="header-img" src={boat} alt="Boat" />
+      <div className="logo">
+        <img src={logo} alt="Logo" className="logo-icon" />
+      </div>
+    </header>
   )
 }
 
@@ -21,6 +21,8 @@ function App() {
   const [showForm, setShowForm] = useState(false)
   const [email, setEmail] = useState("");
   const [projectCode, setProjectCode] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   const [formData, setFormData] = useState({
     // email: '',
@@ -59,22 +61,20 @@ function App() {
   }
 
   const handleSubmit = async (e) => {
+    setIsSubmitting(true);
     e.preventDefault()
     // fetch(import.meta.env.VITE_BURL, { body: JSON.stringify(formData) , method: 'POST'} )
-    const res = axios.post(import.meta.env.VITE_BURL+"/create-ticket", form, {
+    const res = axios.post(import.meta.env.VITE_BURL + "/create-ticket", form, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     })
     const data = await res
-    // console.log(data.data.ticketNumber)
-    // if (res) {
-    //   alert(`Ticket created successfully! ticket number is ${data.data.ticketNumber}`)
-    // }
-    if(res){
-       toast.success("Ticket created with " + ` ticket Number is #${data.data.ticketNumber}`   , {
-      position: "top-right"
-    });
+    setIsSubmitting(false);
+    if (res) {
+      toast.success("Ticket created with " + ` ticket Number is #${data.data.ticketNumber}`, {
+        position: "top-right"
+      });
     }
 
     setEmail([])
@@ -108,7 +108,7 @@ function App() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(import.meta.env.VITE_BURL+"/get-users"); // Replace with your API
+      const response = await fetch(import.meta.env.VITE_BURL + "/get-users"); // Replace with your API
       const res = await response.json();
       setAllData(res.data);
       setHasFetched(true);
@@ -160,7 +160,7 @@ function App() {
 
   const fetchProjectCode = async () => {
     try {
-      const response = await fetch(import.meta.env.VITE_BURL+"/get-projectcode");
+      const response = await fetch(import.meta.env.VITE_BURL + "/get-projectcode");
       const res = await response.json();
       setAllProjectData(res.data);
       setHasProjectsFetched(true);
@@ -175,30 +175,30 @@ function App() {
       setFilteredProjectData(data);
     }
   }, [allProjectData]);
-  
+
   const handleProjectCodeClick = () => {
     if (!hasProjectsFetched) {
       fetchProjectCode();
     }
   };
-  
+
   const handleProjectCodeChange = (e) => {
     const value = e.target.value;
     setProjectCode(value);
-    
+
     // Filter project codes as user types
     const matched = filteredProjectData.filter((item) =>
       item.toLowerCase().includes(value.toLowerCase())
-  );
+    );
     setMatchedProjectCodes(matched);
   };
-  
+
   const selectProjectCode = (selectedCode) => {
     setProjectCode(selectedCode);
     setMatchedProjectCodes([]);
   };
-  
-  
+
+
   // end of getting the project code ----------
 
   if (showForm) {
@@ -228,9 +228,9 @@ function App() {
                     <div className="email-autocomplete-dropdown">
                       {matchedEmails.map((mail, index) => (
                         <div
-                        key={index}
-                        onClick={() => selectEmail(mail.email)}
-                        className="email-autocomplete-item"
+                          key={index}
+                          onClick={() => selectEmail(mail.email)}
+                          className="email-autocomplete-item"
                         >
                           <span className='email-autocomplete-name'>{mail.name}</span>
                           <br />
@@ -244,7 +244,7 @@ function App() {
 
               <div className="form-group">
                 <div className="project-code-autocomplete-container">
-                  <p className="project-code-autocomplete-title">Project Code <span style={{color :"red"}}>*</span> </p>
+                  <p className="project-code-autocomplete-title">Project Code <span style={{ color: "red" }}>*</span> </p>
 
                   <input
                     type="text"
@@ -254,6 +254,7 @@ function App() {
                     onChange={handleProjectCodeChange}
                     placeholder="Enter project code"
                     className="project-code-autocomplete-input"
+                    required
                   />
 
                   {matchedProjectCodes.length > 0 && (
@@ -273,14 +274,15 @@ function App() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="department">Team <span style={{color :"red"}}>*</span> </label>
+                <label htmlFor="department">Team <span style={{ color: "red" }}>*</span> </label>
                 <select
                   id="teams"
                   name="team"
                   value={formData.team}
                   onChange={handleInputChange}
                   required
-                >{[{ name: "CL - Naval Architecture and Hydrodynamics", id: '1142108000000533040' },
+                >{[{ name: "Select" },
+                { name: "CL - Naval Architecture and Hydrodynamics", id: '1142108000000533040' },
                 { name: "UL - Naval Architecture and Hydrodynamics", id: '1142108000000533054' },
                 { name: "SY - Naval Architecture and Hydrodynamics", id: '1142108000000533068' },
                 { name: "CL - Structural Engineering", id: '1142108000000533082' },
@@ -314,7 +316,7 @@ function App() {
                     name="priority"
                     value={formData.priority}
                     onChange={handleInputChange}
-                    required
+
                   >
                     <option value="">Select</option>
                     <option value="Critical - (24 hrs)">Critical - (24 hrs)</option>
@@ -331,9 +333,9 @@ function App() {
                     name="severity"
                     value={formData.severity}
                     onChange={handleInputChange}
-                    required
-                  > 
-                  <option value="">Select</option>
+
+                  >
+                    <option value="">Select</option>
                     <option value="Show Stopper">Show Stopper</option>
                     <option value="Critical">Critical</option>
                     <option value="Major">Major</option>
@@ -343,7 +345,7 @@ function App() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="projectTitle">Subject  <span style={{color :"red"}}>*</span></label>
+                <label htmlFor="projectTitle">Subject  <span style={{ color: "red" }}>*</span></label>
                 <input
                   type="text"
                   id="projectTitle"
@@ -362,7 +364,7 @@ function App() {
                   value={formData.description}
                   onChange={handleInputChange}
                   rows="4"
-                  required
+
                 />
               </div>
 
@@ -377,9 +379,12 @@ function App() {
                 />
                 <small>Accepted formats: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG , Max size: 15MB</small>
               </div>
-
               <button type="submit" className="submit-button">
-                Submit Ticket
+                {isSubmitting ? (
+                  <div className="spinner"></div>
+                ) : (
+                  'Submit Ticket'
+                )}
               </button>
             </form>
           </div>
@@ -394,12 +399,16 @@ function App() {
       <Header />
       <div className="app">
         <div className="container">
-          <h3 className='front-title'>Ticket Mangemenet</h3>
-          <span className='front-subtitle' >Engineering And  Production</span>
-          <p style={{ margin: '40px 0  10px  0' , }}>Select Zoho user type:</p>
+          <h3 className="front-title">Ticket Mangement</h3>
+          <span className="front-subtitle">Engineering And Production</span>
+          <p style={{ margin: '40px 0 10px 0' }}>Select Zoho user type:</p>
 
           <div className="button-container">
-            <a className="user-button desk-user" style={{ textDecoration: 'none' }} href="https://www.zoho.com/desk/login.html">
+            <a
+              className="user-button desk-user"
+              style={{ textDecoration: 'none' }}
+              href="https://www.zoho.com/desk/login.html"
+            >
               Zoho Desk User
             </a>
             <button className="user-button other-user" onClick={handleOtherUserClick}>
@@ -408,6 +417,7 @@ function App() {
           </div>
         </div>
       </div>
+
     </>
   )
 }
