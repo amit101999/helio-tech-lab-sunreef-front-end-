@@ -1,7 +1,8 @@
-import { useState } from 'react'
+
+
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import axios from "axios"
-import { useEffect } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import Header from './component/Header';
 
@@ -10,13 +11,16 @@ function App() {
   const [email, setEmail] = useState("");
   const [projectCode, setProjectCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorEmail, setErrorEmail] = useState(false)
+  const [ErrorFileSize, setErrorSize] = useState(false)
 
+  // Refs for detecting clicks outside
+  const emailContainerRef = useRef(null);
+  const projectCodeContainerRef = useRef(null);
 
   const [formData, setFormData] = useState({
-    // email: '',
-    // projectCode: '',
     department: '',
-    team: '',
+    team: 'Naval Architecture and Hydrodynamics',
     priority: '',
     severity: '',
     projectTitle: '',
@@ -49,81 +53,106 @@ function App() {
   }
 
   const handleSubmit = async (e) => {
-    setIsSubmitting(true);
     e.preventDefault()
-    const res = axios.post(import.meta.env.VITE_BURL + "/create-ticket", form, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
+    if (!/sunreef.com/.test(email)) {
+      setErrorEmail(true)
+    } else {
+      setErrorEmail(false)
+      if (formData.fileUpload && formData.fileUpload.size > 1024 * 1024 * 14) {
+        setErrorSize(true)
+      } else {
+        setErrorSize(false)
       }
-    })
-    const data = await res
-    setIsSubmitting(false);
-    if (res) {
-      toast.success("Ticket created with " + ` ticket Number is #${data.data.ticketNumber}`, {
-        position: "top-right"
-      });
-    }
 
-    setEmail([])
-    setProjectCode([])
-    setFormData({
-      department: '',
-      team: '',
-      priority: '',
-      severity: '',
-      projectTitle: '',
-      description: '',
-      fileUpload: null
-    })
-  }
+      setIsSubmitting(true);
+      const res = axios.post(import.meta.env.VITE_BURL + "/create-ticket", form, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      const data = await res
+      setIsSubmitting(false);
+      if (res) {
+        toast.success("Ticket created with " + ` ticket Number is #${data.data.ticketNumber}`, {
+          position: "top-right"
+        });
+      }
 
-  const handleProjectCode = async () => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_BURL}/get-project-code`); // Replace with your API
-      const res = await response.json();
-      console.log(res)
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
+      setEmail("")
+      setProjectCode("")
+      setFormData({
+        department: '',
+        team: '',
+        priority: '',
+        severity: '',
+        projectTitle: '',
+        description: '',
+        fileUpload: null
+      })
     }
   }
 
-  // getting of email and name of user ------ start 
+  // Email-related state and functions
   const [allData, setAllData] = useState([]);
-  const [filteredData, setFilteredData] = useState([{}]);
+  const [filteredData, setFilteredData] = useState([]);
   const [matchedEmails, setMatchedEmails] = useState([]);
-  const [hasFetched, setHasFetched] = useState(false);
 
-  const fetchData = async () => {
-    try {
-      const response = await fetch(import.meta.env.VITE_BURL + "/get-users"); // Replace with your API
-      const res = await response.json();
-      setAllData(res.data);
-      setHasFetched(true);
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
-    }
-  };
+  // Project code-related state and functions
+  const [allProjectData, setAllProjectData] = useState([]);
+  const [filteredProjectData, setFilteredProjectData] = useState([]);
+  const [matchedProjectCodes, setMatchedProjectCodes] = useState([]);
 
+  // Fetch data when form loads
   useEffect(() => {
-    const emails = allData.map((item) =>
-    ({
+    if (showForm) {
+      // Fetch users data
+      const fetchUsersData = async () => {
+        try {
+          const response = await fetch(import.meta.env.VITE_BURL + "/get-users");
+          const res = await response.json();
+          setAllData(res.data);
+        } catch (error) {
+          console.error("Failed to fetch users data:", error);
+        }
+      };
+
+      // Fetch project codes data
+      const fetchProjectCodesData = async () => {
+        try {
+          const response = await fetch(import.meta.env.VITE_BURL + "/get-projectcode");
+          const res = await response.json();
+          setAllProjectData(res.data);
+        } catch (error) {
+          console.error("Failed to fetch project codes data:", error);
+        }
+      };
+
+      fetchUsersData();
+      fetchProjectCodesData();
+    }
+  }, [showForm]);
+
+  // Process users data when it changes
+  useEffect(() => {
+    const emails = allData.map((item) => ({
       name: item.name || "",
       email: item.cf?.cf_email || "",
-    })
-    );
+    }));
     setFilteredData(emails);
   }, [allData]);
 
-  const handleClick = () => {
-    if (!hasFetched) {
-      fetchData();
+  // Process project codes data when it changes
+  useEffect(() => {
+    if (allProjectData && allProjectData.length > 0) {
+      const data = allProjectData.map((item) => item.name);
+      setFilteredProjectData(data);
     }
-  };
+  }, [allProjectData]);
 
+  // Handle email input change
   const handleEmailChange = (e) => {
     const value = e.target.value;
     setEmail(value);
-
     // Filter emails as user types
     const matched = filteredData.filter((mail) =>
       mail.email.toLowerCase().includes(value.toLowerCase())
@@ -131,48 +160,16 @@ function App() {
     setMatchedEmails(matched);
   };
 
+  // Select email from dropdown
   const selectEmail = (selectedMail) => {
     setEmail(selectedMail);
     setMatchedEmails([]);
   };
 
-  // end of  code of getting of email and name of user ------
-
-  //  getting the project code ---------
-  const [allProjectData, setAllProjectData] = useState([]);
-  const [filteredProjectData, setFilteredProjectData] = useState([]);
-  const [matchedProjectCodes, setMatchedProjectCodes] = useState([]);
-  const [hasProjectsFetched, setHasProjectsFetched] = useState(false);
-
-
-  const fetchProjectCode = async () => {
-    try {
-      const response = await fetch(import.meta.env.VITE_BURL + "/get-projectcode");
-      const res = await response.json();
-      setAllProjectData(res.data);
-      setHasProjectsFetched(true);
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (allProjectData && allProjectData.length > 0) {
-      const data = allProjectData.map((item) => item.name); // or add filtering logic
-      setFilteredProjectData(data);
-    }
-  }, [allProjectData]);
-
-  const handleProjectCodeClick = () => {
-    if (!hasProjectsFetched) {
-      fetchProjectCode();
-    }
-  };
-
+  // Handle project code input change
   const handleProjectCodeChange = (e) => {
     const value = e.target.value;
     setProjectCode(value);
-
     // Filter project codes as user types
     const matched = filteredProjectData.filter((item) =>
       item.toLowerCase().includes(value.toLowerCase())
@@ -180,13 +177,38 @@ function App() {
     setMatchedProjectCodes(matched);
   };
 
+  // Select project code from dropdown
   const selectProjectCode = (selectedCode) => {
     setProjectCode(selectedCode);
     setMatchedProjectCodes([]);
   };
 
+  // Handle clicks outside to clear dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Clear email dropdown if clicked outside
+      if (emailContainerRef.current && !emailContainerRef.current.contains(event.target)) {
+        setMatchedEmails([]);
+        setEmail("");
+      }
+      
+      // Clear project code dropdown if clicked outside
+      if (projectCodeContainerRef.current && !projectCodeContainerRef.current.contains(event.target)) {
+        setMatchedProjectCodes([]);
+        setProjectCode("");
+      }
+    };
 
-  // end of getting the project code ----------
+    // Add event listener when form is shown
+    if (showForm) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    // Cleanup event listener
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showForm]);
 
   if (showForm) {
     return (
@@ -196,21 +218,19 @@ function App() {
           <div className="container">
             <h1 style={{ fontSize: '2rem' }}>Create a Ticket</h1>
 
-            <form className="user-form" onSubmit={handleSubmit}>
+            <form className="user-form" onSubmit={handleSubmit} encType='multipart/form-data'>
               <div className="form-group">
-                <div className="email-autocomplete-container" >
-                  {/* <p className="email-autocomplete-title">Your Email </p> */}
-                   <label htmlFor="priority">Your Email </label>
+                <div className="email-autocomplete-container" ref={emailContainerRef}>
+                  <label htmlFor="email">Your Email </label>
                   <input
                     type="email"
                     value={email}
                     name='email'
-                    onClick={handleClick}
                     onChange={handleEmailChange}
                     placeholder="Enter email"
                     className="email-autocomplete-input"
                   />
-
+                  <span style={{ color: "red" }}>{errorEmail && "Please enter an email with sunreef.com domain"}</span>
                   {matchedEmails.length > 0 && (
                     <div className="email-autocomplete-dropdown">
                       {matchedEmails.map((mail, index) => (
@@ -221,7 +241,7 @@ function App() {
                         >
                           <span className='email-autocomplete-name'>{mail.name}</span>
                           <br />
-                          <span className='email-autocomplete-email' >{mail.email}</span>
+                          <span className='email-autocomplete-email'>{mail.email}</span>
                         </div>
                       ))}
                     </div>
@@ -230,15 +250,12 @@ function App() {
               </div>
 
               <div className="form-group">
-                <div className="project-code-autocomplete-container">
-                    <label htmlFor="priority">Project Code <span style={{ color: "red" }}>*</span> </label>
-                  {/* <p className="project-code-autocomplete-title">Project Code <span style={{ color: "red" }}>*</span> </p> */}
-
+                <div className="project-code-autocomplete-container" ref={projectCodeContainerRef}>
+                  <label htmlFor="projectCode">Project Code <span style={{ color: "red" }}>*</span></label>
                   <input
                     type="text"
                     value={projectCode}
                     name='projectCode'
-                    onClick={handleProjectCodeClick}
                     onChange={handleProjectCodeChange}
                     placeholder="Enter project code"
                     className="project-code-autocomplete-input"
@@ -279,32 +296,17 @@ function App() {
                   value={formData.team}
                   onChange={handleInputChange}
                   required
-                >{[{ name: "Select" },
-                { name: "CL - Naval Architecture and Hydrodynamics", id: '1142108000000533040' },
-                { name: "UL - Naval Architecture and Hydrodynamics", id: '1142108000000533054' },
-                { name: "SY - Naval Architecture and Hydrodynamics", id: '1142108000000533068' },
-                { name: "CL - Structural Engineering", id: '1142108000000533082' },
-                { name: "UL - Structural Engineering", id: '1142108000000533096' },
-                { name: "SY - Structural Engineering", id: '1142108000000533110' },
-                { name: "CL - Mechanical Propulsion and Systems Engineering", id: '1142108000000533124' },
-                { name: "UL - Mechanical Propulsion and Systems Engineering", id: '1142108000000533140' },
-                { name: "SY - Mechanical Propulsion and Systems Engineering", id: '1142108000000533154' },
-                { name: "CL - Electrical and Electrical Power Systems", id: '1142108000000533168' },
-                { name: "UL - Electrical and Electrical Power Systems", id: '1142108000000533182' },
-                { name: "SY - Electrical and Electrical Power Systems", id: '1142108000000533202' },
-                { name: "CL - Interior Design and Fitout Engineering", id: '1142108000000533216' },
-                { name: "UL - Interior Design and Fitout Engineering", id: '1142108000000533230' },
-                { name: "SY - Interior Design and Fitout Engineering", id: '1142108000000533244' },
-                { name: "CL - Outfitting and Deck Systems", id: '1142108000000533258' },
-                { name: "UL - Outfitting and Deck Systems", id: '1142108000000533272' },
-                { name: "SY - Outfitting and Deck Systems", id: '1142108000000533286' },
-                { name: "CL - 3D CAD/Master Modelling Cell", id: '1142108000000533300' },
-                { name: "UL - 3D CAD/Master Modelling Cell", id: '1142108000000533318' },
-                { name: "SY - 3D CAD/Master Modelling Cell", id: '1142108000000533332' }]
-                  .map((x, i) => <option key={i} value={x.id}>{x.name}</option>)}
+                >{[
+                  { name: "Naval Architecture and Hydrodynamics" },
+                  { name: "Structural Engineering", id: '1142108000000533082' },
+                  { name: "Mechanical Propulsion and Systems Engineering" },
+                  { name: "Electrical and Electrical Power Systems" },
+                  { name: "Interior Design and Fitout Engineering" },
+                  { name: "Outfitting and Deck Systems" },
+                  { name: "3D CAD/Master Modelling Cell" }]
+                  .map((x, i) => <option key={i} value={x.name}>{x.name}</option>)}
                 </select>
               </div>
-
 
               <div className="form-row">
                 <div className="form-group">
@@ -314,7 +316,6 @@ function App() {
                     name="priority"
                     value={formData.priority}
                     onChange={handleInputChange}
-
                   >
                     <option value="">Select</option>
                     <option value="Critical - (24 hrs)">Critical - (24 hrs)</option>
@@ -331,7 +332,6 @@ function App() {
                     name="severity"
                     value={formData.severity}
                     onChange={handleInputChange}
-
                   >
                     <option value="">Select</option>
                     <option value="Show Stopper">Show Stopper</option>
@@ -343,7 +343,7 @@ function App() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="projectTitle">Subject  <span style={{ color: "red" }}>*</span></label>
+                <label htmlFor="projectTitle">Subject <span style={{ color: "red" }}>*</span></label>
                 <input
                   type="text"
                   id="projectTitle"
@@ -362,21 +362,22 @@ function App() {
                   value={formData.description}
                   onChange={handleInputChange}
                   rows="4"
-
                 />
               </div>
 
               <div className="form-group">
                 <label htmlFor="fileUpload">File Upload</label>
                 <input
+                  multiple
                   type="file"
                   id="fileUpload"
                   name="fileUpload"
                   onChange={handleInputChange}
-                  capture = {false}
+                  capture={false}
                   accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
                 />
                 <small>Accepted formats: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG , Max size: 15MB</small>
+                <small style={{ color: 'red' }}>{ErrorFileSize && 'File size should be less than 15MB'}</small>
               </div>
               <button type="submit" className="submit-button">
                 {isSubmitting ? (
@@ -400,7 +401,7 @@ function App() {
         <div className="container">
           <h3 className="front-title">Ticket Management</h3>
           <span className="front-subtitle">Engineering And Production</span>
-          <p style={{ margin: '40px 0 10px 0' , fontWeight: 'bold' }}>Select Zoho user type:</p>
+          <p style={{ margin: '40px 0 10px 0', fontWeight: 'bold' }}>Select Zoho user type:</p>
 
           <div className="button-container">
             <a
@@ -414,9 +415,9 @@ function App() {
               Non Zoho User
             </button>
           </div>
+          <p style={{ margin: '20px 0 0px 0' }} ><a style={{ color: "#000", fontWeight: "bold" }} href="https://sunreef-users.vercel.app/">Download The App</a> </p>
         </div>
       </div>
-
     </>
   )
 }
