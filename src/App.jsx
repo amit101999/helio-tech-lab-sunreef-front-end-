@@ -3,19 +3,7 @@ import './App.css'
 import axios from "axios"
 import { useEffect } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
-import logo from "./assets/logo4.png";
-import boat from "./assets/boat.jpeg"
-
-function Header() {
-  return (
-    <header className="header">
-      <img className="header-img" src={boat} alt="Boat" />
-      <div className="logo">
-        <img src={logo} alt="Logo" className="logo-icon" />
-      </div>
-    </header>
-  )
-}
+import Header from './component/Header';
 
 function App() {
   const [showForm, setShowForm] = useState(false)
@@ -63,7 +51,6 @@ function App() {
   const handleSubmit = async (e) => {
     setIsSubmitting(true);
     e.preventDefault()
-    // fetch(import.meta.env.VITE_BURL, { body: JSON.stringify(formData) , method: 'POST'} )
     const res = axios.post(import.meta.env.VITE_BURL + "/create-ticket", form, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -411,7 +398,7 @@ function App() {
       <Header />
       <div className="app app-home">
         <div className="container">
-          <h3 className="front-title">Ticket Mangement</h3>
+          <h3 className="front-title">Ticket Management</h3>
           <span className="front-subtitle">Engineering And Production</span>
           <p style={{ margin: '40px 0 10px 0' , fontWeight: 'bold' }}>Select Zoho user type:</p>
 
