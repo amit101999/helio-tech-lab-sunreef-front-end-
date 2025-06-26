@@ -211,9 +211,9 @@ function App() {
 
             <form className="user-form" onSubmit={handleSubmit}>
               <div className="form-group">
-                <div className="email-autocomplete-container">
-                  <p className="email-autocomplete-title">Your Email </p>
-
+                <div className="email-autocomplete-container" >
+                  {/* <p className="email-autocomplete-title">Your Email </p> */}
+                   <label htmlFor="priority">Your Email </label>
                   <input
                     type="email"
                     value={email}
@@ -244,7 +244,8 @@ function App() {
 
               <div className="form-group">
                 <div className="project-code-autocomplete-container">
-                  <p className="project-code-autocomplete-title">Project Code <span style={{ color: "red" }}>*</span> </p>
+                    <label htmlFor="priority">Project Code <span style={{ color: "red" }}>*</span> </label>
+                  {/* <p className="project-code-autocomplete-title">Project Code <span style={{ color: "red" }}>*</span> </p> */}
 
                   <input
                     type="text"
@@ -281,7 +282,7 @@ function App() {
                     <div className="tooltip">
                       CL - Classic<br />
                       UL - Ultima<br />
-                      SL - Super yacht
+                      SY - Super Yacht
                     </div>
                   </span>
                 </label>
