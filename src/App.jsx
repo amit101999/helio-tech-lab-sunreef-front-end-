@@ -409,11 +409,11 @@ function App() {
   return (
     <>
       <Header />
-      <div className="app">
+      <div className="app app-home">
         <div className="container">
           <h3 className="front-title">Ticket Mangement</h3>
           <span className="front-subtitle">Engineering And Production</span>
-          <p style={{ margin: '40px 0 10px 0' }}>Select Zoho user type:</p>
+          <p style={{ margin: '40px 0 10px 0' , fontWeight: 'bold' }}>Select Zoho user type:</p>
 
           <div className="button-container">
             <a
