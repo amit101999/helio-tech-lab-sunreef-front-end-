@@ -189,13 +189,11 @@ function App() {
       // Clear email dropdown if clicked outside
       if (emailContainerRef.current && !emailContainerRef.current.contains(event.target)) {
         setMatchedEmails([]);
-        setEmail("");
       }
       
       // Clear project code dropdown if clicked outside
       if (projectCodeContainerRef.current && !projectCodeContainerRef.current.contains(event.target)) {
         setMatchedProjectCodes([]);
-        setProjectCode("");
       }
     };
 
