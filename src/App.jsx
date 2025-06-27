@@ -279,14 +279,14 @@ function App() {
               <div className="form-group">
                 <label htmlFor="department" style={{ display: "flex", alignItems: "center", gap: "1px" }}>
                   Team <span style={{ color: "red" }}>*</span>
-                  <span className="tooltip-button">
+                  {/*<span className="tooltip-button">
                     i
                     <div className="tooltip">
                       CL - Classic<br />
                       UL - Ultima<br />
                       SY - Super Yacht
                     </div>
-                  </span>
+                  </span>*/}
                 </label>
                 <select
                   id="teams"
