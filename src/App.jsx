@@ -1,14 +1,14 @@
-
-
 import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import axios from "axios"
 import { ToastContainer, toast } from 'react-toastify';
 import Header from './component/Header';
+import FileUpload from './component/FileUpload';
 
 function App() {
   const [showForm, setShowForm] = useState(false)
   const [email, setEmail] = useState("");
+  const [files, setFiles] = useState([]);
   const [projectCode, setProjectCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorEmail, setErrorEmail] = useState(false)
@@ -34,7 +34,7 @@ function App() {
     const { name, value, files } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: files ? files[0] : value
+      [name]: files ? files : value
     }))
   }
 
@@ -47,10 +47,8 @@ function App() {
   form.append('severity', formData.severity)
   form.append('projectTitle', formData.projectTitle)
   form.append('description', formData.description)
+  files && files.forEach(file => form.append('fileUpload', file))
 
-  if (formData.fileUpload) {
-    form.append('fileUpload', formData.fileUpload)
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -134,6 +132,7 @@ function App() {
 
   // Process users data when it changes
   useEffect(() => {
+    if (allData === undefined) return
     const emails = allData.map((item) => ({
       name: item.name || "",
       email: item.cf?.cf_email || "",
@@ -190,7 +189,7 @@ function App() {
       if (emailContainerRef.current && !emailContainerRef.current.contains(event.target)) {
         setMatchedEmails([]);
       }
-      
+
       // Clear project code dropdown if clicked outside
       if (projectCodeContainerRef.current && !projectCodeContainerRef.current.contains(event.target)) {
         setMatchedProjectCodes([]);
@@ -219,7 +218,7 @@ function App() {
             <form className="user-form" onSubmit={handleSubmit} encType='multipart/form-data'>
               <div className="form-group">
                 <div className="email-autocomplete-container" ref={emailContainerRef}>
-                  <label htmlFor="email">Your Email </label>
+                  <label htmlFor="email">Your Email <span style={{ color: "red" }}>*</span> </label>
                   <input
                     type="email"
                     value={email}
@@ -365,7 +364,7 @@ function App() {
 
               <div className="form-group">
                 <label htmlFor="fileUpload">File Upload</label>
-                <input
+                {/*<input
                   multiple
                   type="file"
                   id="fileUpload"
@@ -373,8 +372,9 @@ function App() {
                   onChange={handleInputChange}
                   capture={false}
                   accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
-                />
-                <small>Accepted formats: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG , Max size: 15MB</small>
+                />*/}
+                <FileUpload files={files} setFiles={setFiles} />
+                <small>Accepted formats: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG , Max size: 15MB, Max files: 10</small>
                 <small style={{ color: 'red' }}>{ErrorFileSize && 'File size should be less than 15MB'}</small>
               </div>
               <button type="submit" className="submit-button">

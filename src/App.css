@@ -205,6 +205,7 @@ label {
 input,
 select,
 textarea {
+  border-radius: 5px;
   width: 100%;
   padding: clamp(10px, 2.5vw, 14px) clamp(12px, 3vw, 18px);
   border: 2px solid #e1e5e9;
