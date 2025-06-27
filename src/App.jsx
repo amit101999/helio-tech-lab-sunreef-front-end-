@@ -86,7 +86,7 @@ function App() {
         toast.success(
           "Ticket created with " +
           `Ticket Number is #${ticketNumber ?? ''}`,
-          { position: "top-right" },
+          { position: "top-right", style: {borderRadius: '5px', color: "black"}, hideProgressBar: true },
         );
       }
 
@@ -553,7 +553,7 @@ function App() {
               <button
                 onClick={() => {
                   window.navigator.clipboard.writeText(ticketNumber).then(() =>
-                    toast.success("Ticket ID Copied!")
+                    toast.success("Ticket ID Copied!", { position: "top-right", style: { borderRadius: '5px', color: "black" }, hideProgressBar: true })
                   );
                 }}
                 className="user-button"
