@@ -83,7 +83,7 @@ function App() {
         console.log(data)
         setTicketNum(data.data.ticketNumber);
         if (ticketNumber === null) console.error("WARN no ticketNumber received")
-        toast.success(
+        ticketNumber === null && toast.success(
           "Ticket created with " +
           `Ticket Number is #${ticketNumber ?? ''}`,
           { position: "top-right", style: {borderRadius: '5px', color: "black"}, hideProgressBar: true },
@@ -548,7 +548,7 @@ function App() {
                 onClick={() => setThankYou(false)}
                 className="user-button"
               >
-                Go Home
+                Homepage
               </button>
               <button
                 onClick={() => {
