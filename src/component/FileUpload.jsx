@@ -17,8 +17,6 @@ export default function FileUpload({ files, setFiles, submit }) {
       setFileError('Files cannot be more than 10')
       console.error('Files cannot be more than 10')
     }
-    console.log(newSelectedFiles)
-    submit(true) && console.log('submit button enabled');
     const updatedFiles = [...files, ...newSelectedFiles].slice(0, 10).filter(x => {
       const sizeLT15 = x.size <= 1024 * 1024 * 15
       if (!sizeLT15) {
@@ -27,8 +25,8 @@ export default function FileUpload({ files, setFiles, submit }) {
         console.error('File size should be less than 15 MB')
       }
       return sizeLT15
-    }
-    );
+    });
+    submit(true) && console.log('submit button enabled');
     setFiles(updatedFiles);
     setFC(updatedFiles.length)
 
@@ -120,7 +118,7 @@ export default function FileUpload({ files, setFiles, submit }) {
               onChange={handleFileChange}
             />
             <UploadCloud style={{ display: 'block', margin: '0', width: '4rem', height: '4rem', color: '#9ca3af', marginBottom: '0.5rem' }} />
-            <p style={{ color: '#4b5563', fontWeight: '500' }}>Drag & Drop or <span style={{ color: '#2563eb', fontWeight: '600' }}>Browse Files</span></p>
+            <p style={{ color: '#4b5563', fontWeight: '500' }}>Drag & Drop or <span style={{ color: files.length < 10 ? '#2563eb' : 'gray', fontWeight: '600' }}>Browse Files</span></p>
             {fileError && <p style={{ color: 'red', marginBottom: 0 }}>
               {fileError}
             </p>}
