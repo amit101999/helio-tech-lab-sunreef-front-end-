@@ -1,22 +1,34 @@
 import React, { useState, useCallback } from 'react';
 import { UploadCloud, FileText, FileVideo, FileImage, XCircle } from 'lucide-react';
 
-export default function FileUpload({ files, setFiles }) {
+export default function FileUpload({ files, setFiles, submit }) {
   // const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [fileCount, setFC] = useState(0);
-  const [exceedingFilesError, setExceedingFilesError] = useState(false);
+  const [fileError, setFileError] = useState(null);
 
   // Function to handle file input change
   const handleFileChange = useCallback((event) => {
     const newSelectedFiles = Array.from(event.target.files);
     if (newSelectedFiles.length === 0) return;
+    setFileError(null)
     if (newSelectedFiles.length > 10) {
-      setExceedingFilesError(true)
-      return;
-    } else setExceedingFilesError(false)
-    const updatedFiles = [...files, ...newSelectedFiles];
+      setFileError('Files cannot be more than 10')
+      console.error('Files cannot be more than 10')
+    }
+    console.log(newSelectedFiles)
+    submit(true) && console.log('submit button enabled');
+    const updatedFiles = [...files, ...newSelectedFiles].slice(0, 10).filter(x => {
+      const sizeLT15 = x.size <= 1024 * 1024 * 15
+      if (!sizeLT15) {
+        submit(false);
+        setFileError('File size should be less than 15 MB')
+        console.error('File size should be less than 15 MB')
+      }
+      return sizeLT15
+    }
+    );
     setFiles(updatedFiles);
     setFC(updatedFiles.length)
 
@@ -107,15 +119,15 @@ export default function FileUpload({ files, setFiles }) {
               style={{ display: 'none' }}
               onChange={handleFileChange}
             />
-            <UploadCloud style={{ display: 'block', margin: '0 auto', width: '4rem', height: '4rem', color: '#9ca3af', marginBottom: '0.75rem' }} />
+            <UploadCloud style={{ display: 'block', margin: '0', width: '4rem', height: '4rem', color: '#9ca3af', marginBottom: '0.5rem' }} />
             <p style={{ color: '#4b5563', fontWeight: '500' }}>Drag & Drop or <span style={{ color: '#2563eb', fontWeight: '600' }}>Browse Files</span></p>
-            <p style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: 0 }}>(Max 15MB per file)</p>
-            {exceedingFilesError && <p style={{ fontSize: '0.75rem', color: 'red', marginBottom: 0 }}>
-              Max Files Accepted: 10
+            {fileError && <p style={{ color: 'red', marginBottom: 0 }}>
+              {fileError}
             </p>}
+            <p style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: 0 }}>(Max 15MB per file)</p>
+
           </div>
 
-          {/* Display selected files with previews */}
           {files.length > 0 && (
             <div style={{
               marginTop: '1.5rem',

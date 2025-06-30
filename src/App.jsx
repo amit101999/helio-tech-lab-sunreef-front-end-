@@ -15,6 +15,7 @@ function App() {
   const [errorEmail, setErrorEmail] = useState(false);
   const [ErrorFileSize, setErrorSize] = useState(false);
   const [thankYou, setThankYou] = useState(false);
+  const [submitButton, setSubmitButton] = useState(true);
 
   // Refs for detecting clicks outside
   const emailContainerRef = useRef(null);
@@ -22,7 +23,7 @@ function App() {
 
   const [formData, setFormData] = useState({
     department: "",
-    team: "Naval Architecture and Hydrodynamics",
+    team: "",
     priority: "",
     severity: "",
     projectTitle: "",
@@ -435,11 +436,9 @@ function App() {
                     required
                   >
                     {[
+                      { name: "Select Team" },
                       { name: "Naval Architecture and Hydrodynamics" },
-                      {
-                        name: "Structural Engineering",
-                        id: "1142108000000533082",
-                      },
+                      { name: "Structural Engineering", },
                       { name: "Mechanical Propulsion and Systems Engineering" },
                       { name: "Electrical and Electrical Power Systems" },
                       { name: "Interior Design and Fitout Engineering" },
@@ -528,7 +527,7 @@ function App() {
                   accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
                 />*/
                   }
-                  <FileUpload files={files} setFiles={setFiles} />
+                  <FileUpload files={files} setFiles={setFiles} submit={setSubmitButton} />
                   <small>
                     Accepted formats: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG , Max
                     size: 15MB, Max files: 10
@@ -537,7 +536,7 @@ function App() {
                     {ErrorFileSize && "File size should be less than 15MB"}
                   </small>
                 </div>
-                <button type="submit" className="submit-button">
+                <button disabled={!submitButton} type="submit" className="submit-button">
                   {isSubmitting ? <div className="spinner"></div> : (
                     "Submit Ticket"
                   )}

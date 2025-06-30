@@ -271,6 +271,27 @@ small {
   transform: translateY(0);
 }
 
+.submit-button[disabled] {
+  filter: grayscale('100%');
+  background-color: gray;
+  text-decoration: solid;
+}
+
+.submit-button[disabled]:hover {
+  transform: none;
+  box-shadow: none;
+  filter: grayscale('100%');
+  background-color: gray;
+  text-decoration: solid;
+}
+
+.submit-button[disabled] {
+  filter: grayscale('100%');
+  background-color: gray;
+  text-decoration: solid;
+
+}
+
 /* Autocomplete styles */
 .email-autocomplete-container,
 .project-code-autocomplete-container {
