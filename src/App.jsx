@@ -108,6 +108,7 @@ function App() {
         description: "",
         fileUpload: null,
       });
+      setFiles([])
     }
   };
 
