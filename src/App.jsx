@@ -74,7 +74,6 @@ function App() {
       setErrorEmail(false);
       if (projectErrorFlag) {
         setProjectCodeError(true)
-        console.log(projectErrorFlag, projectCodeError)
         return
       } else setProjectCodeError(false);
       // file size validation
@@ -99,10 +98,10 @@ function App() {
         setThankYou(true);
         setShowForm(false);
         const tNum = data.data.ticketNumber;
-        if (ticketNumber === null) {
+        if (tNum === null) {
           console.error("WARN no ticketNumber received");
         }
-        setTicketNum(tNum);
+        setTicketNum(tNum)
         ticketNumber === null && toast.success(
           "Ticket created with " +
           `Ticket Number is #${String(tNum).padStart(6, '0') ?? ""}`,
