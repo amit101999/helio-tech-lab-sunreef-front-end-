@@ -16,6 +16,7 @@ function App() {
   const [ErrorFileSize, setErrorSize] = useState(false);
   const [thankYou, setThankYou] = useState(false);
   const [submitButton, setSubmitButton] = useState(true);
+  const [projectCodeError, setProjectCodeError] = useState(false);
 
   // Refs for detecting clicks outside
   const emailContainerRef = useRef(null);
@@ -57,10 +58,25 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Email validation
-    if (!/sunreef.com/.test(email)) {
+    let emailErrorFlag = false;
+    filteredData.forEach((mails) => {
+      if (email === mails.email) {
+        emailErrorFlag = true;
+      }
+    });
+
+    // check user entered the correct project code
+    const projectErrorFlag = !filteredProjectData.includes(projectCode);
+
+    if (!/sunreef.com/.test(email) || !emailErrorFlag) {
       setErrorEmail(true);
     } else {
       setErrorEmail(false);
+      if (projectErrorFlag) {
+        setProjectCodeError(true)
+        console.log(projectErrorFlag, projectCodeError)
+        return
+      } else setProjectCodeError(false);
       // file size validation
       if (formData.fileUpload && formData.fileUpload.size > 1024 * 1024 * 14) {
         setErrorSize(true);
@@ -372,7 +388,7 @@ function App() {
                     />
                     <span style={{ color: "red" }}>
                       {errorEmail &&
-                        "Please enter an email with sunreef.com domain"}
+                        "Please enter a valid E-mail."}
                     </span>
                     {matchedEmails.length > 0 && (
                       <div className="email-autocomplete-dropdown">
@@ -413,6 +429,7 @@ function App() {
                       className="project-code-autocomplete-input"
                       required
                     />
+                    {projectCodeError && <span style={{color: 'red'}}>Enter a valid project number</span>}
 
                     {matchedProjectCodes.length > 0 && (
                       <div className="project-code-autocomplete-dropdown">
@@ -529,7 +546,7 @@ function App() {
                 <div className="form-group">
                   <label htmlFor="description">Description</label>
                   <textarea
-                    style={{fontFamily: 'sans'}}
+                    style={{ fontFamily: 'sans' }}
                     id="description"
                     name="description"
                     value={formData.description}
