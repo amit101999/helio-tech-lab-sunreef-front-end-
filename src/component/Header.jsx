@@ -1,7 +1,7 @@
 import React from 'react'
 import "../App.css"
 import logo from "../assets/logo4.png"
-import boat from "../assets/boat.jpeg"
+import boat from "../assets/bg.jpg"
 
 const Header = () => {
   return (
