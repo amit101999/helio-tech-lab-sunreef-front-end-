@@ -5,7 +5,6 @@ export default function FileUpload({ files, setFiles, submit }) {
   // const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [fileCount, setFC] = useState(0);
   const [fileError, setFileError] = useState(null);
 
   // Function to handle file input change
@@ -28,7 +27,6 @@ export default function FileUpload({ files, setFiles, submit }) {
     });
     submit(true) && console.log('submit button enabled');
     setFiles(updatedFiles);
-    setFC(updatedFiles.length)
 
     // Generate previews for the newly selected files
     const newFilePreviews = [];
@@ -55,14 +53,13 @@ export default function FileUpload({ files, setFiles, submit }) {
         }
       }
     });
-  }, [files]);
+  }, [files, setFiles, submit]);
 
   // Function to remove a file by its index
   const removeFile = useCallback((indexToRemove) => {
     setFiles(currentFiles => currentFiles.filter((_, index) => index !== indexToRemove));
-    setFC(files.length)
     setPreviews(currentPreviews => currentPreviews.filter((_, index) => index !== indexToRemove));
-  }, []);
+  }, [setFiles]);
 
   // Function to open the file input dialog
   const openFileBrowser = useCallback(() => {

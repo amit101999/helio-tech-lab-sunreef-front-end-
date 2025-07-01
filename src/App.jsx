@@ -56,16 +56,17 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Email validation
     if (!/sunreef.com/.test(email)) {
       setErrorEmail(true);
     } else {
       setErrorEmail(false);
+      // file size validation
       if (formData.fileUpload && formData.fileUpload.size > 1024 * 1024 * 14) {
         setErrorSize(true);
       } else {
         setErrorSize(false);
       }
-
       setIsSubmitting(true);
       const res = axios.post(
         import.meta.env.VITE_BURL + "/create-ticket",
@@ -455,7 +456,7 @@ function App() {
                       { name: "3D CAD/Master Modelling Cell" },
                     ]
                       .map((x, i) => (
-                        <option key={i} value={x.name}>{x.name}</option>
+                        <option key={i}  disabled={!i} value={i ? x.name  : ""}>{x.name}</option>
                       ))}
                   </select>
                 </div>
