@@ -108,7 +108,7 @@ function App() {
         description: "",
         fileUpload: null,
       });
-      setFiles([])
+      setFiles([]);
     }
   };
 
@@ -179,10 +179,14 @@ function App() {
     const value = e.target.value;
     setEmail(value);
     // Filter emails as user types
-    const matched = filteredData.filter((mail) =>
-      mail.email.toLowerCase().includes(value.toLowerCase())
-    );
-    setMatchedEmails(matched);
+    if (value) {
+      const matched = filteredData.filter((mail) =>
+        mail.email.toLowerCase().includes(value.toLowerCase())
+      );
+      setMatchedEmails(matched);
+    } else {
+      setMatchedEmails(filteredData)
+    }
   };
 
   // Select email from dropdown
@@ -196,10 +200,14 @@ function App() {
     const value = e.target.value;
     setProjectCode(value);
     // Filter project codes as user types
-    const matched = filteredProjectData.filter((item) =>
-      item.toLowerCase().includes(value.toLowerCase())
-    );
-    setMatchedProjectCodes(matched);
+    if (value) {
+      const matched = filteredProjectData.filter((item) =>
+        item.toLowerCase().includes(value.toLowerCase())
+      );
+      setMatchedProjectCodes(matched);
+    } else {
+      setMatchedProjectCodes(filteredProjectData);
+    }
   };
 
   // Select project code from dropdown
@@ -439,7 +447,7 @@ function App() {
                     {[
                       { name: "Select Team" },
                       { name: "Naval Architecture and Hydrodynamics" },
-                      { name: "Structural Engineering", },
+                      { name: "Structural Engineering" },
                       { name: "Mechanical Propulsion and Systems Engineering" },
                       { name: "Electrical and Electrical Power Systems" },
                       { name: "Interior Design and Fitout Engineering" },
@@ -528,7 +536,11 @@ function App() {
                   accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
                 />*/
                   }
-                  <FileUpload files={files} setFiles={setFiles} submit={setSubmitButton} />
+                  <FileUpload
+                    files={files}
+                    setFiles={setFiles}
+                    submit={setSubmitButton}
+                  />
                   <small>
                     Accepted formats: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG , Max
                     size: 15MB, Max files: 10
@@ -537,7 +549,11 @@ function App() {
                     {ErrorFileSize && "File size should be less than 15MB"}
                   </small>
                 </div>
-                <button disabled={!submitButton} type="submit" className="submit-button">
+                <button
+                  disabled={!submitButton}
+                  type="submit"
+                  className="submit-button"
+                >
                   {isSubmitting ? <div className="spinner"></div> : (
                     "Submit Ticket"
                   )}
