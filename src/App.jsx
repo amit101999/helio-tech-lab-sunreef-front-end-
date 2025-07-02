@@ -70,62 +70,61 @@ function App() {
 
     if (!/sunreef.com/.test(email) || !emailErrorFlag) {
       setErrorEmail(true);
-    } else {
-      setErrorEmail(false);
-      if (projectErrorFlag) {
-        setProjectCodeError(true)
-        return
-      } else setProjectCodeError(false);
-      // file size validation
-      if (formData.fileUpload && formData.fileUpload.size > 1024 * 1024 * 14) {
-        setErrorSize(true);
-      } else {
-        setErrorSize(false);
+    } else setErrorEmail(false);
+    if (projectErrorFlag) {
+      setProjectCodeError(true)
+      return
+    } else setProjectCodeError(false);
+    // file size validation
+    if (formData.fileUpload && formData.fileUpload.size > 1024 * 1024 * 14) {
+      setErrorSize(true);
+    } else setErrorSize(false);
+
+    setIsSubmitting(true);
+    const res = axios.post(
+      import.meta.env.VITE_BURL + "/create-ticket",
+      form,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+
+    const data = await res;
+    setIsSubmitting(false);
+    if (res) {
+      setThankYou(true);
+      setShowForm(false);
+      const tNum = data.data.ticketNumber;
+      if (tNum === null) {
+        console.error("WARN no ticketNumber received");
       }
-      setIsSubmitting(true);
-      const res = axios.post(
-        import.meta.env.VITE_BURL + "/create-ticket",
-        form,
+      setTicketNum(tNum)
+      ticketNumber === null && toast.success(
+        "Ticket created with " +
+        `Ticket Number is #${String(tNum).padStart(6, '0') ?? ""}`,
         {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          position: "top-right",
+          style: { borderRadius: "5px", color: "black" },
+          hideProgressBar: true,
         },
       );
-      const data = await res;
-      setIsSubmitting(false);
-      if (res) {
-        setThankYou(true);
-        setShowForm(false);
-        const tNum = data.data.ticketNumber;
-        if (tNum === null) {
-          console.error("WARN no ticketNumber received");
-        }
-        setTicketNum(tNum)
-        ticketNumber === null && toast.success(
-          "Ticket created with " +
-          `Ticket Number is #${String(tNum).padStart(6, '0') ?? ""}`,
-          {
-            position: "top-right",
-            style: { borderRadius: "5px", color: "black" },
-            hideProgressBar: true,
-          },
-        );
-      }
-
-      setEmail("");
-      setProjectCode("");
-      setFormData({
-        department: "",
-        team: "",
-        priority: "",
-        severity: "",
-        projectTitle: "",
-        description: "",
-        fileUpload: null,
-      });
-      setFiles([]);
     }
+
+    setEmail("");
+    setProjectCode("");
+    setFormData({
+      department: "",
+      team: "",
+      priority: "",
+      severity: "",
+      projectTitle: "",
+      description: "",
+      fileUpload: null,
+    });
+    setFiles([]);
+
   };
 
   // Email-related state and functions
@@ -428,7 +427,7 @@ function App() {
                       className="project-code-autocomplete-input"
                       required
                     />
-                    {projectCodeError && <span style={{color: 'red'}}>Enter a valid project number</span>}
+                    {projectCodeError && <span style={{ color: 'red' }}>Enter a valid project number</span>}
 
                     {matchedProjectCodes.length > 0 && (
                       <div className="project-code-autocomplete-dropdown">
